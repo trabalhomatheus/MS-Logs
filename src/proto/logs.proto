@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package logs;
+
+service Logs {
+  rpc ListLogs (ListLogsRequest) returns (ListLogsResponse);
+  rpc CreateLog (CreateLogRequest) returns (CreateLogResponse);
+}
+
+message Log {
+  string id = 1;
+  string service = 2;
+  string message = 3;
+  string user = 4;
+  string timestamp = 5;
+  string log = 6;
+}
+
+message ListLogsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message ListLogsResponse {
+  repeated Log logs = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+  int32 totalPages = 5;
+  bool hasNext = 6;
+  bool hasPrev = 7;
+}
+
+message CreateLogRequest {
+  string service = 1;
+  string message = 2;
+  string user = 3;
+  string log = 4;
+}
+
+message CreateLogResponse {
+  Log log = 1;
+}

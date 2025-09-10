@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logs
+  labels:
+    app: logs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logs
+  template:
+    metadata:
+      labels:
+        app: logs
+    spec:
+      initContainers:
+        - name: wait-for-mongo
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              echo "Aguardando logsDB..."
+              until nc -z logsdb 27017; do
+                echo "logsDB ainda não está pronto..."
+                sleep 2
+              done
+              echo "MongoDB está pronto!"
+      containers:
+        - name: logs
+          image: logs-microservice:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50051
+              name: grpc
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongo:mongo@logsdb:27017/logsdb?authSource=admin"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
